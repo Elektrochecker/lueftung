@@ -1,0 +1,46 @@
+body {
+    background-color: rgb(45, 57, 66);
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#btns {
+    margin: 4px;
+}
+
+#log {
+    height: 40%;
+    overflow: auto;
+}
+
+#log2 {
+    height: 40%;
+    overflow: auto;
+}
+
+.dark-div {
+    white-space: pre-line;
+    background-color: rgb(30, 30, 35);
+    margin:4px;
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.control-btn {
+  background-color: rgb(30, 30, 35);
+  color: #dadada;
+  border-radius: 8px;
+  border-width: 0;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 10px 12px;
+  text-align: center;
+  touch-action: manipulation;
+  transition: all 200ms;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
