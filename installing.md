@@ -13,7 +13,7 @@ restart nginx.
 
 `npm install pm2@latest -g`
 
-`pm2 start index.js`
+`pm2 start lueftung.js`
 
 `pm2 startup systemd`
 
@@ -23,6 +23,6 @@ restart nginx.
 
 then:
 
-`pm2 monitor index`
+`pm2 monitor lueftung`
 
-`pm2 restart index`
+`pm2 restart lueftung`

@@ -57,7 +57,8 @@ function lftToggle() {
     })
     .then(response => {
       log2(`(${response.status}) HTTP-POST toggle`, color.positive)
-      lftStatus()
+      
+      setTimeout(lftStatus, 500)
     })
     .catch(err => {
       log2(err, color.err)
