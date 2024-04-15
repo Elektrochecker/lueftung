@@ -1,23 +1,17 @@
-let currentStatus = false;
-
 let color = {
     default: "rgb(220, 220, 220)",
     positive: "rgb(20, 160, 120)",
     negative: "rgb(180, 20, 80)",
     err: "red",
-  }
-  
+}
 
-lftDebug();
-lftStatus();
-
-let log = (message, c=color.default) => {
+let log = (message, c = color.default) => {
     let m = timestamp() + message
     let style = `color: ${c}`
     logdiv.innerHTML = `<b style="${style}">${m}\n</b>` + logdiv.innerHTML
 }
 
-let log2 = (message, c=color.default) => {
+let log2 = (message, c = color.default) => {
     let m = timestamp() + message
     let style = `color: ${c}`
     log2div.innerHTML = `<b style="${style}">${m}\n</b>` + log2div.innerHTML
@@ -40,9 +34,9 @@ let timeFromSeconds = sec => {
     s = Math.ceil(sec)
 
     let h = Math.floor(s / 3600)
-    s -= h*3600
+    s -= h * 3600
     let m = Math.floor(s / 60)
-    s -= m*60
+    s -= m * 60
 
     h = h.toString()
     m = m.toString()
@@ -54,3 +48,15 @@ let timeFromSeconds = sec => {
 
     return `[${h}:${m}:${s}] `
 }
+
+let updateDisplay = lueftung => {
+    let colHP = lueftung.heatpump ? color.positive : color.negative
+    let colHT = lueftung.heating ? color.positive : color.negative
+    let colPW = lueftung.power ? color.positive : color.negative
+
+    displayHeatpump.style.color = colHP
+    displayHeating.style.color = colHT
+    displayPower.style.color = colPW
+}
+
+lftStatus();

@@ -4,21 +4,32 @@
 <link href="style.css" rel="stylesheet" type="text/css">
 
 <head>
-	<meta name="viewport" content="width=device-width">
-	
+    <meta name="viewport" content="width=device-width">
+
     <script defer src="api.js"></script>
     <script defer src="dom.js"></script>
     <script defer src="main.js"></script>
 </head>
 
 <body>
-    <div id="btns">
-        <button class="control-btn" id="refresh">refresh</button>
-        <button class="control-btn" id="toggle">power</button>
+    <div class="button-div">
+        <button class="control-btn" id="display-power">lüftung</button>
+        <button class="control-btn" id="display-heatpump">wärmepumpe</button>
+        <button class="control-btn" id="display-heating">heizung</button>
     </div>
 
     <div class="dark-div" id="log"></div>
     <div class="dark-div" id="log2"></div>
+
+    <div class="button-div" style="margin-bottom: 4px;">
+        <button class="control-btn" id="btn-debug">server status</button>
+        <button class="control-btn" id="btn-refresh">aktualisieren</button>
+    </div>
+    <div class="button-div">
+        <button class="control-btn" id="btn-power">lüftung</button>
+        <button class="control-btn" id="btn-level">stufe</button>
+        <button class="control-btn" id="btn-heating">heizung</button>
+    </div>
 </body>
 
 </html>

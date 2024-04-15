@@ -73,8 +73,22 @@ app.get("/lueftung/status", cors(), (req, res) => {
     res.status(200).send(lueftung)
 });
 
-app.post("/lueftung/toggle", cors(), (req, res) => {
+app.post("/lueftung/power", cors(), (req, res) => {
     pulse(pin_write_pwrbtn)
+    update()
+
+    res.status(200).send(lueftung)
+})
+
+app.post("/lueftung/heating", cors(), (req, res) => {
+    pulse(pin_write_heating)
+    update()
+
+    res.status(200).send(lueftung)
+})
+
+app.post("/lueftung/level", cors(), (req, res) => {
+    pulse(pin_write_stufe)
     update()
 
     res.status(200).send(lueftung)

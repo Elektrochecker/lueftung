@@ -11,11 +11,17 @@ function lftStatus() {
       log2(`(${response.status}) HTTP-GET status`, color.positive)
       return response.json();
     })
-    .then(lueftung => {
-      currentStatus = lueftung.power
-      msg = lueftung.power ? "currently on" : "currently off"
+    .then(response => {
+      let lueftung = response
+
+      let statusLFT = lueftung.power ? "EIN" : "AUS"
+      let statusHEIZ = lueftung.heating ? "EIN" : "AUS"
+      let statusWP = lueftung.heatpump ? "EIN" : "AUS"
       col = lueftung.power ? color.positive : color.negative
-      log(msg, col)
+
+      log(`Lüftung ${statusLFT}, Heizung ${statusHEIZ}, WP ${statusWP}`, col)
+
+      updateDisplay(lueftung);
     })
     .catch(err => {
       log2(err, color.err)
@@ -34,9 +40,8 @@ function lftDebug() {
     .then(result => {
       info = result
 
-      log2("established connection")
       log2("server uptime:  " + timeFromSeconds(info.uptime))
-      log2("OS uptime:      " + timeFromSeconds(info.osuptime))
+      log2("device uptime:  " + timeFromSeconds(info.osuptime))
       log2("system time:    " + timestamp(info.systime))
       log2("local IP:       " + info.ip)
       log2("cpu:            " + info.cpu + ` (${info.threadCount} threads)`)
@@ -46,8 +51,8 @@ function lftDebug() {
     })
 }
 
-function lftToggle() {
-  return fetch(`http://${ip}:${localPORT}/lueftung/toggle`, {
+function lftToggle(endpoint = "power") {
+  return fetch(`http://${ip}:${localPORT}/lueftung/${endpoint}`, {
       method: "POST",
       mode: "cors",
       body: JSON.stringify({}),
@@ -56,7 +61,7 @@ function lftToggle() {
       },
     })
     .then(response => {
-      log2(`(${response.status}) HTTP-POST toggle`, color.positive)
+      log2(`(${response.status}) HTTP-POST (${endpoint})`, color.positive)
       
       setTimeout(lftStatus, 500)
     })
