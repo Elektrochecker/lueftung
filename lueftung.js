@@ -12,6 +12,8 @@ let lueftung = {
     heatpump: false,
 }
 
+const timeRules = [];
+
 rpio.init({
     gpiomem: true,
     mapping: "physical",
@@ -104,5 +106,63 @@ function pulse(pin) {
     rpio.write(pin, rpio.HIGH)
     setTimeout(() => rpio.write(pin, rpio.LOW), 250)
 }
+
+class Time {
+    constructor(t = new Date()) {
+        this.timeInMinutes = -1
+
+        if (t instanceof Date) {
+            this.timeInMinutes = t.getMinutes() + 60 * t.getHours()
+        } else if (typeof t == "string") {
+            this.timeInMinutes = t.slice(0, 2) * 60 + t.slice(3, 5) * 1
+        } else if (typeof t == "number") {
+            this.timeInMinutes = t
+        }
+    }
+
+    postpone = (h, m = 0) => {
+        this.timeInMinutes += 60 * h + m
+    }
+
+    format = () => {
+        let h = Math.floor(this.timeInMinutes / 60)
+        let m = Math.floor(this.timeInMinutes % 60)
+        h = h.toString()
+        m = m.toString()
+        if (h.length < 2) h = "0" + h
+        if (m.length < 2) m = "0" + m
+
+        return `${h}:${m}`
+    }
+}
+
+class TimeRule {
+    constructor(aTime, reusable, activationCallback) {
+        this.lastCheckedTime = new Time()
+        this.activationTime = aTime
+        this.callback = activationCallback
+        this.isRepeating = reusable
+    }
+
+    checkForActivation = () => {
+        let t = new Time()
+        let lastt = this.lastCheckedTime
+        this.lastCheckedTime = new Time()
+
+        let v = (t.timeInMinutes >= this.activationTime.timeInMinutes) &&
+            (lastt.timeInMinutes < this.activationTime.timeInMinutes)
+
+        if(v) {
+            this.callback()
+            console.log(t.format() + " activated a time rule")
+        }
+
+        return v
+    }
+}
+
+setInterval(() => {
+    timeRules.forEach(rule => rule.checkForActivation())
+}, 5000)
 
 update()
