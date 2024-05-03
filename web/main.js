@@ -5,6 +5,14 @@ let color = {
     err: "red",
 }
 
+let settings = {
+    timerule: {
+        time : "00:00",
+        state: false,
+        reusable: false,
+    }
+}
+
 let log = (message, c = color.default) => {
     let m = timestamp() + message
     let style = `color: ${c}`
@@ -59,4 +67,8 @@ let updateDisplay = lueftung => {
     displayPower.style.color = colPW
 }
 
-lftStatus();
+lftStatus()
+getCurrentTimerules()
+btnTimeruleState.innerHTML = settings.timerule.state ? "anschalten" : "ausschalten"
+btnTimeruleReusable.innerHTML = settings.timerule.reusable ? "wiederholend" : "einmalig"
+inputTimeruleTime.onchange()

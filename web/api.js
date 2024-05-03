@@ -8,7 +8,7 @@ function lftStatus() {
       mode: "cors",
     })
     .then(response => {
-      log2(`(${response.status}) HTTP-GET status`, color.positive)
+      // log(`(${response.status}) HTTP-GET status`, color.positive)
       return response.json();
     })
     .then(response => {
@@ -24,7 +24,7 @@ function lftStatus() {
       updateDisplay(lueftung);
     })
     .catch(err => {
-      log2(err, color.err)
+      log(err, color.err)
     })
 }
 
@@ -34,20 +34,20 @@ function lftDebug() {
       mode: "cors",
     })
     .then(response => {
-      log2(`(${response.status}) HTTP-GET system information`, color.positive)
+      // log(`(${response.status}) HTTP-GET system information`, color.positive)
       return response.json();
     })
     .then(result => {
       info = result
 
-      log2("server uptime:  " + timeFromSeconds(info.uptime))
-      log2("device uptime:  " + timeFromSeconds(info.osuptime))
-      log2("system time:    " + timestamp(info.systime))
-      log2("local IP:       " + info.ip)
-      log2("cpu:            " + info.cpu + ` (${info.threadCount} threads)`)
+      log("server uptime:  " + timeFromSeconds(info.uptime))
+      log("device uptime:  " + timeFromSeconds(info.osuptime))
+      log("system time:    " + timestamp(info.systime))
+      log("local IP:       " + info.ip)
+      log("cpu:            " + info.cpu + ` (${info.threadCount} threads)`)
     })
     .catch(err => {
-      log2(err, color.err)
+      log(err, color.err)
     })
 }
 
@@ -61,11 +61,84 @@ function lftToggle(endpoint = "power") {
       },
     })
     .then(response => {
-      log2(`(${response.status}) HTTP-POST (${endpoint})`, color.positive)
+      // log(`(${response.status}) HTTP-POST (${endpoint})`, color.positive)
       
       setTimeout(lftStatus, 500)
     })
     .catch(err => {
-      log2(err, color.err)
+      log(err, color.err)
+    })
+}
+
+function makeTimeRulePower(time, state, reusable) {
+  return fetch(`http://${ip}:${localPORT}/lueftung/make-time-rule-power`, {
+      method: "POST",
+      mode: "cors",
+      body: JSON.stringify({
+        time: time,
+        state: state,
+        reusable: reusable,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then(response => {
+      // log(`(${response.status}) HTTP-POST time rule`, color.positive)
+      setTimeout(getCurrentTimerules, 500)
+    })
+    .catch(err => {
+      log(err, color.err)
+    })
+}
+
+function deleteAllTimeRules(time, state, reusable) {
+  return fetch(`http://${ip}:${localPORT}/lueftung/delete-all-time-rules`, {
+      method: "POST",
+      mode: "cors",
+      body: JSON.stringify({
+        time: time,
+        state: state,
+        reusable: reusable,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then(response => {
+      log("alle regeln gelöscht", color.negative)
+      
+      setTimeout(getCurrentTimerules, 500)
+    })
+    .catch(err => {
+      log(err, color.err)
+    })
+}
+
+function getCurrentTimerules() {
+  return fetch(`http://${ip}:${localPORT}/lueftung/current-time-rules`, {
+      method: "GET",
+      mode: "cors",
+    })
+    .then(response => {
+      return response.json();
+    })
+    .then(result => {
+      timeRules = result
+
+      log2div.innerHTML = ""
+
+      timeRules.forEach(r => {
+        let {time, reusable, desc} = r
+        str = `um ${time}: ${desc} (${reusable ? "wiederholend" : "einmalig"})`
+        log2(str)
+      })
+
+      if(timeRules.length == 0)  log2(`Es sind keine regeln definiert.`)
+      else if (timeRules.length == 1) log2(`Es ist ${timeRules.length} regel definiert:`)
+      else log2(`Es sind ${timeRules.length} regeln definiert:`)
+    })
+    .catch(err => {
+      log(err, color.err)
     })
 }

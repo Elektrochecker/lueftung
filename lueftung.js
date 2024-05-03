@@ -12,7 +12,7 @@ let lueftung = {
     heatpump: false,
 }
 
-const timeRules = [];
+let timeRules = [];
 
 rpio.init({
     gpiomem: true,
@@ -76,7 +76,7 @@ app.get("/lueftung/status", cors(), (req, res) => {
 });
 
 app.post("/lueftung/power", cors(), (req, res) => {
-    pulse(pin_write_pwrbtn)
+    setPower(!lueftung.power)
     update()
 
     res.status(200).send(lueftung)
@@ -96,6 +96,38 @@ app.post("/lueftung/level", cors(), (req, res) => {
     res.status(200).send(lueftung)
 })
 
+app.post("/lueftung/make-time-rule-power", cors(), (req, res) => {
+
+    let {time, state, reusable} = req.body
+    
+    console.log("made a time rule: " + time + (state ? ", on, " : ", off, ") + (reusable ? "reusable" : "one-time-only"))
+
+    let r = new TimeRule(time, reusable, state ? powerOn : powerOff, state ? "an" : "aus")
+
+    timeRules.push(r)
+    res.status(200).send()
+})
+
+app.post("/lueftung/delete-all-time-rules", cors(), (req, res) => {
+    console.log("deleted all time rules")
+    timeRules = []
+    res.status(200).send()
+})
+
+app.get("/lueftung/current-time-rules", cors(), (req, res) => {
+    let r = []
+
+    timeRules.forEach(rule => {
+        r.push({
+            time: rule.activationTime.format(),
+            reusable: rule.isRepeating,
+            desc: rule.desc
+        })
+    })
+
+    res.status(200).send(r)
+});
+
 function update() {
     lueftung.power = rpio.read(pin_read_pwr) === rpio.HIGH
     lueftung.heating = rpio.read(pin_read_heating) === rpio.HIGH
@@ -107,12 +139,27 @@ function pulse(pin) {
     setTimeout(() => rpio.write(pin, rpio.LOW), 250)
 }
 
+function setPower(state) {
+    if (typeof state != "boolean") return
+
+    update()
+    if (lueftung.power != state) {
+        pulse(pin_write_pwrbtn)
+        console.log(new Time().format() + "> toggled power to " + state)
+    }
+}
+
+let powerOn = () => setPower(true)
+let powerOff = () => setPower(false)
+
 class Time {
     constructor(t = new Date()) {
         this.timeInMinutes = -1
 
         if (t instanceof Date) {
             this.timeInMinutes = t.getMinutes() + 60 * t.getHours()
+        } else if (t instanceof Time) {
+            this.timeInMinutes = t.timeInMinutes
         } else if (typeof t == "string") {
             this.timeInMinutes = t.slice(0, 2) * 60 + t.slice(3, 5) * 1
         } else if (typeof t == "number") {
@@ -122,6 +169,7 @@ class Time {
 
     postpone = (h, m = 0) => {
         this.timeInMinutes += 60 * h + m
+        return this
     }
 
     format = () => {
@@ -137,11 +185,12 @@ class Time {
 }
 
 class TimeRule {
-    constructor(aTime, reusable, activationCallback) {
+    constructor(aTime, reusable, activationCallback, description="no description") {
         this.lastCheckedTime = new Time()
-        this.activationTime = aTime
+        this.activationTime = new Time(aTime)
         this.callback = activationCallback
         this.isRepeating = reusable
+        this.desc = description
     }
 
     checkForActivation = () => {
@@ -152,9 +201,9 @@ class TimeRule {
         let v = (t.timeInMinutes >= this.activationTime.timeInMinutes) &&
             (lastt.timeInMinutes < this.activationTime.timeInMinutes)
 
-        if(v) {
+        if (v) {
             this.callback()
-            console.log(t.format() + " activated a time rule")
+            console.log(t.format() + "> activated a time rule")
         }
 
         return v
@@ -162,7 +211,13 @@ class TimeRule {
 }
 
 setInterval(() => {
-    timeRules.forEach(rule => rule.checkForActivation())
+    // console.log(timeRules.length)
+    timeRules.forEach((rule, i, arr) => {
+        // console.log(rule.activationTime.format())
+        if (rule.checkForActivation() && !rule.isRepeating) {
+            arr.splice(i, 1)
+        }
+    })
 }, 5000)
 
 update()
