@@ -130,7 +130,7 @@ function getCurrentTimerules() {
 
       timeRules.forEach(r => {
         let {time, reusable, desc} = r
-        str = `um ${time}: ${desc} (${reusable ? "wiederholend" : "einmalig"})`
+        str = `um ${time} ${desc} (${reusable ? "wiederholend" : "einmalig"})`
         log2(str)
       })
 
@@ -141,4 +141,9 @@ function getCurrentTimerules() {
     .catch(err => {
       log(err, color.err)
     })
+}
+
+function makePowerTimer(hours, state, reusable = false) {
+  let t = timeWithOffset(hours)
+  makeTimeRulePower(t, state, reusable)
 }

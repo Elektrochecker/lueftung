@@ -6,10 +6,13 @@ let btnLevel = document.getElementById("btn-level")
 
 let btnTimeruleActivate = document.getElementById("btn-timerule-activate")
 let btnTimeruleDelete = document.getElementById("btn-timerule-delete")
-let btnTimeruleRefresh = document.getElementById("btn-timerule-refresh")
 let btnTimeruleReusable = document.getElementById("btn-timerule-reusable")
 let btnTimeruleState = document.getElementById("btn-timerule-status")
 let inputTimeruleTime = document.getElementById("input-timerule-time")
+
+let btnTimer1h = document.getElementById("btn-timer-0")
+let btnTimer2h = document.getElementById("btn-timer-1")
+let btnTimer4h = document.getElementById("btn-timer-2")
 
 let displayHeatpump = document.getElementById("display-heatpump")
 let displayHeating = document.getElementById("display-heating")
@@ -18,20 +21,23 @@ let displayPower = document.getElementById("display-power")
 let logdiv = document.getElementById("log")
 let log2div = document.getElementById("log2")
 
-btnRefresh.onclick = lftStatus
+btnRefresh.onclick = () => {
+    lftStatus()
+    getCurrentTimerules()
+}
+
 btnDebug.onclick = lftDebug
 btnToggle.onclick = () => lftToggle("power")
 btnHeating.onclick = () => lftToggle("heating")
 btnLevel.onclick = () => lftToggle("level")
 
 btnTimeruleDelete.onclick = () => deleteAllTimeRules()
-btnTimeruleRefresh.onclick = () => getCurrentTimerules()
 
 inputTimeruleTime.onchange = () => {
     let t = inputTimeruleTime.valueAsNumber
     t /= 60 * 1000
     let h = Math.floor(t / 60)
-    let m = t - 60 * h
+    let m = Math.floor(t - 60 * h)
 
     h = h.toString()
     m = m.toString()
@@ -56,3 +62,7 @@ btnTimeruleActivate.onclick = () => {
     let { time, state, reusable } = settings.timerule
     makeTimeRulePower(time, state, reusable)
 }
+
+btnTimer1h.onclick = () => makePowerTimer(1, false)
+btnTimer2h.onclick = () => makePowerTimer(2, false)
+btnTimer4h.onclick = () => makePowerTimer(4, false)

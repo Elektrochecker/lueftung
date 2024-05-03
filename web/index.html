@@ -4,7 +4,7 @@
 <link href="style.css" rel="stylesheet" type="text/css">
 
 <head>
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script defer src="api.js"></script>
     <script defer src="dom.js"></script>
@@ -21,12 +21,14 @@
     <div class="horizontal-separator"></div>
 
     <div class="dark-div" id="log"></div>
-    
+
     <div class="button-div">
         <button class="control-btn" id="btn-power">lüftung</button>
         <button class="control-btn" id="btn-level">stufe</button>
         <button class="control-btn" id="btn-heating">heizung</button>
     </div>
+
+    <div class="horizontal-separator"></div>
 
     <div class="button-div">
         <button class="control-btn" id="btn-debug">server status</button>
@@ -34,7 +36,7 @@
     </div>
 
     <div class="horizontal-separator"></div>
-    
+
     <div class="dark-div" id="log2"></div>
 
     <div class="button-div">
@@ -45,8 +47,13 @@
 
     <div class="button-div">
         <button class="control-btn" id="btn-timerule-delete">alle löschen</button>
-        <button class="control-btn" id="btn-timerule-activate">aktivieren</button>
-        <button class="control-btn" id="btn-timerule-refresh">aktualisieren</button>
+        <button class="control-btn" id="btn-timerule-activate">hinzufügen</button>
+    </div>
+
+    <div class="button-div">
+        <button class="control-btn" id="btn-timer-0">aus in 1h</button>
+        <button class="control-btn" id="btn-timer-1">aus in 2h</button>
+        <button class="control-btn" id="btn-timer-2">aus in 4h</button>
     </div>
 </body>
 

@@ -98,11 +98,10 @@ app.post("/lueftung/level", cors(), (req, res) => {
 
 app.post("/lueftung/make-time-rule-power", cors(), (req, res) => {
 
-    let {time, state, reusable} = req.body
-    
-    console.log("made a time rule: " + time + (state ? ", on, " : ", off, ") + (reusable ? "reusable" : "one-time-only"))
+    let { time, state, reusable } = req.body
 
     let r = new TimeRule(time, reusable, state ? powerOn : powerOff, state ? "an" : "aus")
+    console.log("made a time rule: " + r.activationTime.format() + " " + r.desc + (r.isRepeating ? " reusable" : " one-time-only"))
 
     timeRules.push(r)
     res.status(200).send()
@@ -185,7 +184,7 @@ class Time {
 }
 
 class TimeRule {
-    constructor(aTime, reusable, activationCallback, description="no description") {
+    constructor(aTime, reusable, activationCallback, description = "no description") {
         this.lastCheckedTime = new Time()
         this.activationTime = new Time(aTime)
         this.callback = activationCallback
@@ -201,6 +200,11 @@ class TimeRule {
         let v = (t.timeInMinutes >= this.activationTime.timeInMinutes) &&
             (lastt.timeInMinutes < this.activationTime.timeInMinutes)
 
+        let beforeMidnight = new Time("23:59")
+        if (t.timeInMinutes == 0 && lastt.timeInMinutes == beforeMidnight.timeInMinutes && this.activationTime == 0) {
+            v = true
+        }
+
         if (v) {
             this.callback()
             console.log(t.format() + "> activated a time rule")
@@ -211,9 +215,7 @@ class TimeRule {
 }
 
 setInterval(() => {
-    // console.log(timeRules.length)
     timeRules.forEach((rule, i, arr) => {
-        // console.log(rule.activationTime.format())
         if (rule.checkForActivation() && !rule.isRepeating) {
             arr.splice(i, 1)
         }

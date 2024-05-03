@@ -7,7 +7,7 @@ let color = {
 
 let settings = {
     timerule: {
-        time : "00:00",
+        time: "00:00",
         state: false,
         reusable: false,
     }
@@ -20,7 +20,7 @@ let log = (message, c = color.default) => {
 }
 
 let log2 = (message, c = color.default) => {
-    let m = timestamp() + message
+    let m = message
     let style = `color: ${c}`
     log2div.innerHTML = `<b style="${style}">${m}\n</b>` + log2div.innerHTML
 }
@@ -36,6 +36,22 @@ let timestamp = () => {
     if (s.length < 2) s = "0" + s
 
     return `[${h}:${m}:${s}] `
+}
+
+let timeWithOffset = (offsetHours = 0) => {
+    let time = new Date()
+    let h = time.getHours()
+    let m = time.getMinutes()
+
+    h = (h + offsetHours) % 24
+
+    h = h.toString()
+    m = m.toString()
+
+    if (h.length < 2) h = "0" + h
+    if (m.length < 2) m = "0" + m
+
+    return `${h}:${m}`
 }
 
 let timeFromSeconds = sec => {

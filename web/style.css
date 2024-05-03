@@ -22,6 +22,7 @@ div {
     border-radius: 8px;
     height: 35%;
     overflow: auto;
+    font-size: 15px;
 }
 
 .horizontal-separator {
@@ -32,6 +33,13 @@ div {
     height: 6px;
 }
 
+.thin-horizontal-separator {
+    background-color: rgb(100, 100, 110);
+    margin-top: 3px;
+    margin-bottom: 3px;
+    height: 1px;
+}
+
 .control-btn {
     background-color: rgb(30, 30, 35);
     color: #dadada;
@@ -40,7 +48,6 @@ div {
     border-width: 0;
     display: inline-block;
     font-size: 14px;
-    font-weight: 5px;
     line-height: 20px;
     list-style: none;
     margin: 0;
