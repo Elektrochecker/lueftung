@@ -12,6 +12,7 @@ let lueftung = {
     heatpump: false,
 }
 
+const minutesInDay = 24 * 60
 let timeRules = [];
 
 rpio.init({
@@ -101,7 +102,7 @@ app.post("/lueftung/make-time-rule-power", cors(), (req, res) => {
     let { time, state, reusable } = req.body
 
     let r = new TimeRule(time, reusable, state ? powerOn : powerOff, state ? "an" : "aus")
-    console.log("made a time rule: " + r.activationTime.format() + " " + r.desc + (r.isRepeating ? " reusable" : " one-time-only"))
+    console.log(new Time().format() + "> made a time rule: " + r.activationTime.format() + " " + r.desc + (r.isRepeating ? " reusable" : " one-time-only"))
 
     timeRules.push(r)
     res.status(200).send()
@@ -164,10 +165,13 @@ class Time {
         } else if (typeof t == "number") {
             this.timeInMinutes = t
         }
+
+        this.timeInMinutes %= minutesInDay
     }
 
     postpone = (h, m = 0) => {
         this.timeInMinutes += 60 * h + m
+        this.timeInMinutes %= minutesInDay
         return this
     }
 
@@ -194,28 +198,33 @@ class TimeRule {
 
     checkForActivation = () => {
         let t = new Time()
-        let lastt = this.lastCheckedTime
+        let lastt = new Time(this.lastCheckedTime)
+        let actt = new Time(this.activationTime)
         this.lastCheckedTime = new Time()
 
-        let v = (t.timeInMinutes >= this.activationTime.timeInMinutes) &&
-            (lastt.timeInMinutes < this.activationTime.timeInMinutes)
+        let v1 = (t.timeInMinutes >= actt.timeInMinutes) &&
+            (lastt.timeInMinutes < actt.timeInMinutes)
 
-        let beforeMidnight = new Time("23:59")
-        if (t.timeInMinutes == 0 && lastt.timeInMinutes == beforeMidnight.timeInMinutes && this.activationTime == 0) {
-            v = true
-        }
+        //check again with offset to allow triggering at 00:00
+        t.postpone(12)
+        lastt.postpone(12)
+        actt.postpone(12)
 
-        if (v) {
+        let v2 = (t.timeInMinutes >= actt.timeInMinutes) &&
+            (lastt.timeInMinutes < actt.timeInMinutes)
+
+        if (v1 || v2) {
             this.callback()
-            console.log(t.format() + "> activated a time rule")
+            console.log(new Time().format() + "> activated a time rule")
         }
 
-        return v
+        return v1 || v2
     }
 }
 
 setInterval(() => {
     timeRules.forEach((rule, i, arr) => {
+        // check time rules and remove on activation
         if (rule.checkForActivation() && !rule.isRepeating) {
             arr.splice(i, 1)
         }
