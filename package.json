@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.19.2",
+    "express": "^4.21.1",
     "fs": "^0.0.1-security",
     "ip": "^2.0.1",
     "rpio": "^2.4.2"

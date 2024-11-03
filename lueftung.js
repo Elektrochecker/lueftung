@@ -24,7 +24,7 @@ rpio.init({
 
 const pin_read_heatpump = 16 //GPIO 23
 const pin_read_heating = 18 //GPIO 24
-const pin_read_pwr = 22 //GPIO25
+const pin_read_pwr = 22 //GPIO 25
 const pin_write_heating = 24 //GPIO 8
 const pin_write_stufe = 26 //GPIO 7
 const pin_write_pwrbtn = 28 //GPIO 1
@@ -51,7 +51,7 @@ app.all("/*", function(req, res, next) {
 
 app.listen(
     hostingPORT, "0.0.0.0",
-    () => console.log(`server online at http://${ip.address()}:${hostingPORT}`)
+    () => console.log(new Time().format() + "> " + `server online at http://${ip.address()}:${hostingPORT}`)
 );
 
 app.get("/", cors(), (req, res) => {
